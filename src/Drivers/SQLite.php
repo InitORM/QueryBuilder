@@ -12,15 +12,13 @@
  */
 
 declare(strict_types=1);
-namespace InitORM\QueryBuilder;
+namespace InitORM\QueryBuilder\Drivers;
 
-interface QueryBuilderFactoryInterface
+class SQLite extends BaseDriver
 {
-    /**
-     * @param string|null $driver
-     * @return QueryBuilderInterface
-     * @throws
-     */
-    public function createQueryBuilder(?string $driver = null): QueryBuilderInterface;
+
+    protected string $name = 'sqlite';
+
+    protected string $escapeChar = '`';
 
 }

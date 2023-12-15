@@ -7,7 +7,7 @@
  * @author      Muhammet ŞAFAK <info@muhammetsafak.com.tr>
  * @copyright   Copyright © 2023 Muhammet ŞAFAK
  * @license     ./LICENSE  MIT
- * @version     1.0
+ * @version     1.0.1
  * @link        https://www.muhammetsafak.com.tr
  */
 
@@ -20,9 +20,9 @@ class QueryBuilderFactory implements QueryBuilderFactoryInterface
     /**
      * @inheritDoc
      */
-    public function createQueryBuilder(): QueryBuilderInterface
+    public function createQueryBuilder(?string $driver = null): QueryBuilderInterface
     {
-        return new QueryBuilder();
+        return new QueryBuilder($driver);
     }
 
 }

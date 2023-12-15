@@ -7,7 +7,7 @@
  * @author      Muhammet ŞAFAK <info@muhammetsafak.com.tr>
  * @copyright   Copyright © 2023 Muhammet ŞAFAK
  * @license     ./LICENSE  MIT
- * @version     1.0
+ * @version     1.0.1
  * @link        https://www.muhammetsafak.com.tr
  */
 
@@ -31,7 +31,7 @@ class Parameters implements ParameterInterface
      */
     public function set(string $key, mixed $value): self
     {
-        $this->parameters[':' . ltrim(str_replace('.', '', $key), ':')] = $value;
+        $this->parameters[':' . preg_replace("/[^A-Za-z0-9_]/", "", $key)] = $value;
 
         return $this;
     }
@@ -47,6 +47,7 @@ class Parameters implements ParameterInterface
         if ($key instanceof RawQuery) {
             $key = md5((string)$key);
         }
+        $key = preg_replace("/[^A-Za-z0-9_]/", "", $key);
         $originKey = ltrim(str_replace('.', '', $key), ':');
         $i = 0;
         do {
