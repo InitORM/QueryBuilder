@@ -7,7 +7,7 @@
  * @author      Muhammet ŞAFAK <info@muhammetsafak.com.tr>
  * @copyright   Copyright © 2023 Muhammet ŞAFAK
  * @license     ./LICENSE  MIT
- * @version     1.0
+ * @version     1.0.1
  * @link        https://www.muhammetsafak.com.tr
  */
 
@@ -16,7 +16,7 @@ namespace Test\InitORM\QueryBuilder;
 
 use InitORM\QueryBuilder\QueryBuilder;
 
-class SelectQueryUnitTest extends AbstractQueryBuilderUnit
+class SelectQueryDriverUnitTest extends AbstractQueryBuilderDriverUnit
 {
 
     public function testSelectBuilder()
@@ -24,7 +24,7 @@ class SelectQueryUnitTest extends AbstractQueryBuilderUnit
         $this->db->select('id', 'name');
         $this->db->table('user');
 
-        $expected = "SELECT id, name FROM user WHERE 1";
+        $expected = "SELECT `id`, `name` FROM `user` WHERE 1";
 
         $this->assertEquals($expected, $this->db->generateSelectQuery());
         $this->db->resetStructure();
@@ -34,7 +34,7 @@ class SelectQueryUnitTest extends AbstractQueryBuilderUnit
     {
         $this->db->from('post');
 
-        $expected = 'SELECT * FROM post WHERE 1';
+        $expected = 'SELECT * FROM `post` WHERE 1';
 
         $this->assertEquals($expected, $this->db->generateSelectQuery());
         $this->db->resetStructure();
@@ -46,7 +46,7 @@ class SelectQueryUnitTest extends AbstractQueryBuilderUnit
             ->table('post')
             ->selfJoin('user', 'user.id = post.user');
 
-        $expected = "SELECT post.id, post.title, user.name AS authorName FROM post, user WHERE user.id = post.user";
+        $expected = "SELECT `post`.`id`, `post`.`title`, `user`.`name` AS `authorName` FROM `post`, `user` WHERE `user`.`id` = `post`.`user`";
 
         $this->assertEquals($expected, $this->db->generateSelectQuery());
         $this->db->resetStructure();
@@ -58,7 +58,7 @@ class SelectQueryUnitTest extends AbstractQueryBuilderUnit
             ->from('post')
             ->innerJoin('user', 'user.id = post.user');
 
-        $expected = "SELECT post.id, post.title, user.name as authorName FROM post INNER JOIN user ON user.id = post.user WHERE 1";
+        $expected = "SELECT `post`.`id`, `post`.`title`, `user`.`name` as `authorName` FROM `post` INNER JOIN `user` ON `user`.`id` = `post`.`user` WHERE 1";
 
         $this->assertEquals($expected, $this->db->generateSelectQuery());
         $this->db->resetStructure();
@@ -70,7 +70,7 @@ class SelectQueryUnitTest extends AbstractQueryBuilderUnit
         $this->db->from('post');
         $this->db->leftJoin('user', 'user.id=post.user');
 
-        $expected = "SELECT post.id, post.title, user.name as authorName FROM post LEFT JOIN user ON user.id=post.user WHERE 1";
+        $expected = "SELECT `post`.`id`, `post`.`title`, `user`.`name` as `authorName` FROM `post` LEFT JOIN `user` ON `user`.`id`=`post`.`user` WHERE 1";
 
         $this->assertEquals($expected, $this->db->generateSelectQuery());
         $this->db->resetStructure();
@@ -82,7 +82,7 @@ class SelectQueryUnitTest extends AbstractQueryBuilderUnit
         $this->db->from('post');
         $this->db->rightJoin('user', 'user.id=post.user');
 
-        $expected = "SELECT post.id, post.title, user.name as authorName FROM post RIGHT JOIN user ON user.id=post.user WHERE 1";
+        $expected = "SELECT `post`.`id`, `post`.`title`, `user`.`name` as `authorName` FROM `post` RIGHT JOIN `user` ON `user`.`id`=`post`.`user` WHERE 1";
 
         $this->assertEquals($expected, $this->db->generateSelectQuery());
         $this->db->resetStructure();
@@ -95,7 +95,7 @@ class SelectQueryUnitTest extends AbstractQueryBuilderUnit
         $this->db->from('post');
         $this->db->leftOuterJoin('user', 'user.id=post.user');
 
-        $expected = "SELECT post.id, post.title, user.name as authorName FROM post LEFT OUTER JOIN user ON user.id=post.user WHERE 1";
+        $expected = "SELECT `post`.`id`, `post`.`title`, `user`.`name` as `authorName` FROM `post` LEFT OUTER JOIN `user` ON `user`.`id`=`post`.`user` WHERE 1";
 
         $this->assertEquals($expected, $this->db->generateSelectQuery());
         $this->db->resetStructure();
@@ -107,7 +107,7 @@ class SelectQueryUnitTest extends AbstractQueryBuilderUnit
         $this->db->from('post');
         $this->db->rightOuterJoin('user', 'user.id=post.user');
 
-        $expected = "SELECT post.id, post.title, user.name as authorName FROM post RIGHT OUTER JOIN user ON user.id=post.user WHERE 1";
+        $expected = "SELECT `post`.`id`, `post`.`title`, `user`.`name` as `authorName` FROM `post` RIGHT OUTER JOIN `user` ON `user`.`id`=`post`.`user` WHERE 1";
 
         $this->assertEquals($expected, $this->db->generateSelectQuery());
         $this->db->resetStructure();
@@ -119,7 +119,7 @@ class SelectQueryUnitTest extends AbstractQueryBuilderUnit
             ->from('book')
             ->limit(5);
 
-        $expected = 'SELECT id FROM book WHERE 1 LIMIT 5';
+        $expected = 'SELECT `id` FROM `book` WHERE 1 LIMIT 5';
 
         $this->assertEquals($expected, $this->db->generateSelectQuery());
         $this->db->resetStructure();
@@ -131,7 +131,7 @@ class SelectQueryUnitTest extends AbstractQueryBuilderUnit
             ->from('book')
             ->offset(5);
 
-        $expected = 'SELECT id FROM book WHERE 1 OFFSET 5';
+        $expected = 'SELECT `id` FROM `book` WHERE 1 OFFSET 5';
 
         $this->assertEquals($expected, $this->db->generateSelectQuery());
         $this->db->resetStructure();
@@ -144,7 +144,7 @@ class SelectQueryUnitTest extends AbstractQueryBuilderUnit
             ->offset(50)
             ->limit(25);
 
-        $expected = 'SELECT id FROM book WHERE 1 LIMIT 50, 25';
+        $expected = 'SELECT `id` FROM `book` WHERE 1 LIMIT 50, 25';
 
         $this->assertEquals($expected, $this->db->generateSelectQuery());
         $this->db->resetStructure();
@@ -158,7 +158,7 @@ class SelectQueryUnitTest extends AbstractQueryBuilderUnit
             ->limit(-20);
 
         // If limit and offset are negative integers, their absolute values are taken.
-        $expected = 'SELECT id FROM book WHERE 1 LIMIT 25, 20';
+        $expected = 'SELECT `id` FROM `book` WHERE 1 LIMIT 25, 20';
 
         $this->assertEquals($expected, $this->db->generateSelectQuery());
         $this->db->resetStructure();
@@ -168,7 +168,7 @@ class SelectQueryUnitTest extends AbstractQueryBuilderUnit
     {
         $this->db->selectDistinct('name')
             ->from('book');
-        $expected = 'SELECT DISTINCT(name) FROM book WHERE 1';
+        $expected = 'SELECT DISTINCT(`name`) FROM `book` WHERE 1';
 
         $this->assertEquals($expected, $this->db->generateSelectQuery());
         $this->db->resetStructure();
@@ -179,7 +179,7 @@ class SelectQueryUnitTest extends AbstractQueryBuilderUnit
         $this->db->selectDistinct('author.name')
             ->from('book')
             ->innerJoin('author', 'author.id=book.author');
-        $expected = 'SELECT DISTINCT(author.name) FROM book INNER JOIN author ON author.id=book.author WHERE 1';
+        $expected = 'SELECT DISTINCT(`author`.`name`) FROM `book` INNER JOIN `author` ON `author`.`id`=`book`.`author` WHERE 1';
 
         $this->assertEquals($expected, $this->db->generateSelectQuery());
         $this->db->resetStructure();
@@ -193,7 +193,7 @@ class SelectQueryUnitTest extends AbstractQueryBuilderUnit
             ->orderBy('id', 'DESC')
             ->limit(10);
 
-        $expected = 'SELECT name FROM book WHERE 1 ORDER BY authorId ASC, id DESC LIMIT 10';
+        $expected = 'SELECT `name` FROM `book` WHERE 1 ORDER BY `authorId` ASC, `id` DESC LIMIT 10';
 
         $this->assertEquals($expected, $this->db->generateSelectQuery());
         $this->db->resetStructure();
@@ -204,7 +204,7 @@ class SelectQueryUnitTest extends AbstractQueryBuilderUnit
         $this->db->from('post')
             ->andBetween('date', ['2022-05-07', 'CURDATE()']);
 
-        $expected = 'SELECT * FROM post WHERE date BETWEEN :date AND CURDATE()';
+        $expected = 'SELECT * FROM `post` WHERE `date` BETWEEN :date AND CURDATE()';
 
         $this->assertEquals($expected, $this->db->generateSelectQuery());
         $this->db->resetStructure();
@@ -215,7 +215,7 @@ class SelectQueryUnitTest extends AbstractQueryBuilderUnit
         $this->db->from('post')
             ->regexp('title', '^M[a-z]K$');
 
-        $expected = 'SELECT * FROM post WHERE title REGEXP :title';
+        $expected = 'SELECT * FROM `post` WHERE `title` REGEXP :title';
 
         $this->assertEquals($expected, $this->db->generateSelectQuery());
         $this->db->resetStructure();
@@ -229,7 +229,7 @@ class SelectQueryUnitTest extends AbstractQueryBuilderUnit
             ->leftJoin('stat', 'stat.id=post.id')
             ->where('post.id', 5);
 
-        $expected = 'SELECT post.title, COALESCE(stat.view, 0) FROM post LEFT JOIN stat ON stat.id=post.id WHERE post.id = 5';
+        $expected = 'SELECT `post`.`title`, COALESCE(`stat`.`view`, 0) FROM `post` LEFT JOIN `stat` ON `stat`.`id`=`post`.`id` WHERE `post`.`id` = 5';
 
         $this->assertEquals($expected, $this->db->generateSelectQuery());
         $this->db->resetStructure();
@@ -243,7 +243,7 @@ class SelectQueryUnitTest extends AbstractQueryBuilderUnit
             ->leftJoin('stat', 'stat.id=post.id')
             ->where('post.id', 5);
 
-        $expected = 'SELECT post.title, COALESCE(stat.view, post.view) AS views FROM post LEFT JOIN stat ON stat.id=post.id WHERE post.id = 5';
+        $expected = 'SELECT `post`.`title`, COALESCE(`stat`.`view`, `post`.`view`) AS `views` FROM `post` LEFT JOIN `stat` ON `stat`.`id`=`post`.`id` WHERE `post`.`id` = 5';
 
         $this->assertEquals($expected, $this->db->generateSelectQuery());
         $this->db->resetStructure();
@@ -258,7 +258,7 @@ class SelectQueryUnitTest extends AbstractQueryBuilderUnit
             ->leftJoin('stat as s', 's.id=p.id')
             ->where('p.id', 5);
 
-        $expected = 'SELECT p.title, s.view as s_view FROM post as p LEFT JOIN stat as s ON s.id=p.id WHERE p.id = 5';
+        $expected = 'SELECT `p`.`title`, `s`.`view` as `s_view` FROM `post` as `p` LEFT JOIN `stat` as `s` ON `s`.`id`=`p`.`id` WHERE `p`.`id` = 5';
 
         $this->assertEquals($expected, $this->db->generateSelectQuery());
         $this->db->resetStructure();
@@ -272,7 +272,7 @@ class SelectQueryUnitTest extends AbstractQueryBuilderUnit
             ->leftJoin('stat s', 's.id=p.id')
             ->where('p.id', 5);
 
-        $expected = 'SELECT p.title, s.view as s_view FROM post p LEFT JOIN stat s ON s.id=p.id WHERE p.id = 5';
+        $expected = 'SELECT `p`.`title`, `s`.`view` as `s_view` FROM `post` `p` LEFT JOIN `stat` `s` ON `s`.`id`=`p`.`id` WHERE `p`.`id` = 5';
 
         $this->assertEquals($expected, $this->db->generateSelectQuery());
         $this->db->resetStructure();
@@ -288,7 +288,7 @@ class SelectQueryUnitTest extends AbstractQueryBuilderUnit
                     ->where('type', 4);
             });
 
-        $expected = 'SELECT id FROM users WHERE status = 1 AND (type = 3 AND type = 4)';
+        $expected = 'SELECT `id` FROM `users` WHERE `status` = 1 AND (`type` = 3 AND `type` = 4)';
 
         $this->assertEquals($expected, $this->db->generateSelectQuery());
         $this->db->resetStructure();
@@ -314,7 +314,7 @@ class SelectQueryUnitTest extends AbstractQueryBuilderUnit
                     }, 'or');
             }, 'or');
 
-        $expected = 'SELECT id, title, content, url FROM posts WHERE status = 1 AND (user_id = 1 AND datetime >= :datetime) OR ((id = 2 AND status = 3) OR (id = 4 AND status = 5))';
+        $expected = 'SELECT `id`, `title`, `content`, `url` FROM `posts` WHERE `status` = 1 AND (`user_id` = 1 AND `datetime` >= :datetime) OR ((`id` = 2 AND `status` = 3) OR (`id` = 4 AND `status` = 5))';
 
         $this->assertEquals($expected, $this->db->generateSelectQuery());
         $this->db->resetStructure();
@@ -337,7 +337,7 @@ class SelectQueryUnitTest extends AbstractQueryBuilderUnit
                     ->having($builder->raw('COUNT(p.category_id) > 1'));
             })->limit(5);
 
-        $expected = 'SELECT u.id, u.name, u.status, p.title FROM users AS u INNER JOIN posts AS p ON p.user_id = u.id INNER JOIN categories AS c ON c.id = p.category_id AND c.blog_id = u.blog_id WHERE u.status = 1 AND p.publisher_time >= NOW() AND c.status = 1 HAVING COUNT(p.category_id) > 1 LIMIT 5';
+        $expected = 'SELECT `u`.`id`, `u`.`name`, `u`.`status`, `p`.`title` FROM `users` AS `u` INNER JOIN `posts` AS `p` ON `p`.`user_id` = `u`.`id` INNER JOIN `categories` AS `c` ON `c`.`id` = `p`.`category_id` AND `c`.`blog_id` = `u`.`blog_id` WHERE `u`.`status` = 1 AND `p`.`publisher_time` >= NOW() AND `c`.`status` = 1 HAVING COUNT(p.category_id) > 1 LIMIT 5';
         $this->assertEquals($expected, $this->db->generateSelectQuery());
         $this->db->resetStructure();
     }
@@ -352,7 +352,7 @@ class SelectQueryUnitTest extends AbstractQueryBuilderUnit
                     ->from('roles')
                     ->where('name', 'admin');
             }));
-        $expected = 'SELECT u.name FROM users AS u WHERE u.id IN (SELECT id FROM roles WHERE name = :name)';
+        $expected = 'SELECT `u`.`name` FROM `users` AS `u` WHERE `u`.`id` IN (SELECT `id` FROM `roles` WHERE `name` = :name)';
         $this->assertEquals($expected, $this->db->generateSelectQuery());
         $this->db->resetStructure();
     }
@@ -367,7 +367,7 @@ class SelectQueryUnitTest extends AbstractQueryBuilderUnit
                     ->where('user_id', 5);
             }, 'p'), 'p.user_id = u.id', '');
 
-        $expected = 'SELECT u.name, p.title FROM users AS u JOIN (SELECT id, title, user_id FROM posts WHERE user_id = 5) AS p ON p.user_id = u.id WHERE 1';
+        $expected = 'SELECT `u`.`name`, `p`.`title` FROM `users` AS `u` JOIN (SELECT `id`, `title`, `user_id` FROM `posts` WHERE `user_id` = 5) AS `p` ON `p`.`user_id` = `u`.`id` WHERE 1';
         $this->assertEquals($expected, $this->db->generateSelectQuery());
         $this->db->resetStructure();
     }

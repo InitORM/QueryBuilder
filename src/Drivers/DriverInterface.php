@@ -12,15 +12,20 @@
  */
 
 declare(strict_types=1);
-namespace InitORM\QueryBuilder;
+namespace InitORM\QueryBuilder\Drivers;
 
-interface QueryBuilderFactoryInterface
+interface DriverInterface
 {
+
     /**
-     * @param string|null $driver
-     * @return QueryBuilderInterface
-     * @throws
+     * @param string $string
+     * @return string
      */
-    public function createQueryBuilder(?string $driver = null): QueryBuilderInterface;
+    public function escapeIdentify(string &$string): string;
+
+    /**
+     * @return string|null
+     */
+    public function getDriver(): ?string;
 
 }

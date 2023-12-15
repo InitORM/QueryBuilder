@@ -7,7 +7,7 @@
  * @author      Muhammet ŞAFAK <info@muhammetsafak.com.tr>
  * @copyright   Copyright © 2023 Muhammet ŞAFAK
  * @license     ./LICENSE  MIT
- * @version     1.0
+ * @version     1.0.1
  * @link        https://www.muhammetsafak.com.tr
  */
 
@@ -15,6 +15,11 @@ declare(strict_types=1);
 namespace InitORM\QueryBuilder;
 
 use Closure;
+use InitORM\QueryBuilder\Drivers\BaseDriver;
+use InitORM\QueryBuilder\Drivers\DriverInterface;
+use InitORM\QueryBuilder\Drivers\MySQL;
+use InitORM\QueryBuilder\Drivers\PgSQL;
+use InitORM\QueryBuilder\Drivers\SQLite;
 use InitORM\QueryBuilder\Exceptions\{QueryBuilderInvalidArgumentException, QueryBuilderException};
 
 class QueryBuilder implements QueryBuilderInterface
@@ -47,10 +52,19 @@ class QueryBuilder implements QueryBuilderInterface
 
     protected ParameterInterface $parameters;
 
-    public function __construct()
+    protected DriverInterface $driver;
+
+    public function __construct(?string $driver = null)
     {
         $this->structure = self::STRUCTURE;
         $this->parameters = new Parameters();
+
+        $this->driver = match ($driver) {
+            'mysql'                                 => new MySQL(),
+            'pgsql', 'postgres', 'postgresql'       => new PgSQL(),
+            'sqlite'                                => new SQLite(),
+            default                                 => new BaseDriver(),
+        };
     }
 
     /**
@@ -78,7 +92,7 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function newBuilder(): self
     {
-        return new self();
+        return new self($this->driver->getDriver());
     }
 
     /**
@@ -172,6 +186,7 @@ class QueryBuilder implements QueryBuilderInterface
     public function select(...$columns): self
     {
         foreach ($columns as $column) {
+            is_string($column) && $this->driver->escapeIdentify($column);
             $column = (string)$column;
             $this->structure['select'][] = $column;
         }
@@ -194,8 +209,9 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function selectCount(RawQuery|string $column, ?string $alias = null): self
     {
+        is_string($column) && $this->driver->escapeIdentify($column);
         $this->structure['select'][] = 'COUNT(' . $column . ')'
-            . ($alias !== null ? ' AS ' . $alias : '');
+            . ($alias !== null ? ' AS ' . $this->driver->escapeIdentify($alias) : '');
 
         return $this;
     }
@@ -205,8 +221,9 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function selectCountDistinct(RawQuery|string $column, ?string $alias = null): self
     {
+        is_string($column) && $this->driver->escapeIdentify($column);
         $this->structure['select'][] = 'COUNT(DISTINCT ' . $column . ')'
-            . ($alias !== null ? ' AS ' . $alias : '');
+            . ($alias !== null ? ' AS ' . $this->driver->escapeIdentify($alias) : '');
         return $this;
     }
 
@@ -215,8 +232,9 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function selectMax(RawQuery|string $column, ?string $alias = null): self
     {
+        is_string($column) && $this->driver->escapeIdentify($column);
         $this->structure['select'][] = 'MAX(' . $column . ')'
-            . ($alias !== null ? ' AS ' . $alias : '');
+            . ($alias !== null ? ' AS ' . $this->driver->escapeIdentify($alias) : '');
 
         return $this;
     }
@@ -226,8 +244,9 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function selectMin(RawQuery|string $column, ?string $alias = null): self
     {
+        is_string($column) && $this->driver->escapeIdentify($column);
         $this->structure['select'][] = 'MIN(' . $column . ')'
-            . ($alias !== null ? ' AS ' . $alias : '');
+            . ($alias !== null ? ' AS ' . $this->driver->escapeIdentify($alias) : '');
 
         return $this;
     }
@@ -237,8 +256,9 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function selectAvg(RawQuery|string $column, ?string $alias = null): self
     {
+        is_string($column) && $this->driver->escapeIdentify($column);
         $this->structure['select'][] = 'AVG(' . $column . ')'
-            . ($alias !== null ? ' AS ' . $alias : '');
+            . ($alias !== null ? ' AS ' . $this->driver->escapeIdentify($alias) : '');
 
         return $this;
     }
@@ -248,7 +268,8 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function selectAs(RawQuery|string $column, string $alias): self
     {
-        $this->structure['select'][] = $column . ' AS ' . $alias;
+        is_string($column) && $this->driver->escapeIdentify($column);
+        $this->structure['select'][] = $column . ' AS ' . $this->driver->escapeIdentify($alias);
 
         return $this;
     }
@@ -258,8 +279,9 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function selectUpper(RawQuery|string $column, ?string $alias = null): self
     {
+        is_string($column) && $this->driver->escapeIdentify($column);
         $this->structure['select'][] = 'UPPER(' . $column . ')'
-            . ($alias !== null ? ' AS ' . $alias : '');
+            . ($alias !== null ? ' AS ' . $this->driver->escapeIdentify($alias) : '');
 
         return $this;
     }
@@ -269,8 +291,9 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function selectLower(RawQuery|string $column, ?string $alias = null): self
     {
+        is_string($column) && $this->driver->escapeIdentify($column);
         $this->structure['select'][] = 'LOWER(' . $column . ')'
-            . ($alias !== null ? ' AS ' . $alias : '');
+            . ($alias !== null ? ' AS ' . $this->driver->escapeIdentify($alias) : '');
 
         return $this;
     }
@@ -280,8 +303,9 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function selectLength(RawQuery|string $column, ?string $alias = null): self
     {
+        is_string($column) && $this->driver->escapeIdentify($column);
         $this->structure['select'][] = 'LENGTH(' . $column . ')'
-            . ($alias !== null ? ' AS ' . $alias : '');
+            . ($alias !== null ? ' AS ' . $this->driver->escapeIdentify($alias) : '');
 
         return $this;
     }
@@ -291,8 +315,9 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function selectMid(RawQuery|string $column, int $offset, int $length, ?string $alias = null): self
     {
+        is_string($column) && $this->driver->escapeIdentify($column);
         $this->structure['select'][] = 'MID(' . $column . ', ' . $offset . ', ' . $length . ')'
-            . ($alias !== null ? ' AS ' . $alias : '');
+            . ($alias !== null ? ' AS ' . $this->driver->escapeIdentify($alias) : '');
 
         return $this;
     }
@@ -302,8 +327,9 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function selectLeft(RawQuery|string $column, int $length, ?string $alias = null): self
     {
+        is_string($column) && $this->driver->escapeIdentify($column);
         $this->structure['select'][] = 'LEFT(' . $column . ', ' . $length . ')'
-            . ($alias !== null ? ' AS ' . $alias : '');
+            . ($alias !== null ? ' AS ' . $this->driver->escapeIdentify($alias) : '');
 
         return $this;
     }
@@ -313,8 +339,9 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function selectRight(RawQuery|string $column, int $length, ?string $alias = null): self
     {
+        is_string($column) && $this->driver->escapeIdentify($column);
         $this->structure['select'][] = 'RIGHT(' . $column . ', ' . $length . ')'
-            . ($alias !== null ? ' AS ' . $alias : '');
+            . ($alias !== null ? ' AS ' . $this->driver->escapeIdentify($alias) : '');
 
         return $this;
     }
@@ -324,8 +351,9 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function selectDistinct(RawQuery|string $column, ?string $alias = null): self
     {
+        is_string($column) && $this->driver->escapeIdentify($column);
         $this->structure['select'][] = 'DISTINCT(' . $column . ')'
-            . ($alias !== null ? ' AS ' . $alias : '');
+            . ($alias !== null ? ' AS ' . $this->driver->escapeIdentify($alias) : '');
 
         return $this;
     }
@@ -335,8 +363,10 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function selectCoalesce(RawQuery|string $column, $default = '0', ?string $alias = null): self
     {
+        is_string($column) && $this->driver->escapeIdentify($column);
+        is_string($default) && !is_numeric($default) && $this->driver->escapeIdentify($default);
         $this->structure['select'][] = 'COALESCE(' . $column . ', ' . $default .  ')'
-            . ($alias !== null ? ' AS ' . $alias : '');
+            . ($alias !== null ? ' AS ' . $this->driver->escapeIdentify($alias) : '');
 
         return $this;
     }
@@ -346,8 +376,9 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function selectSum(RawQuery|string $column, ?string $alias = null): self
     {
+        is_string($column) && $this->driver->escapeIdentify($column);
         $this->structure['select'][] = 'SUM(' . $column . ')'
-            . ($alias !== null ? ' AS ' . $alias : '');
+            . ($alias !== null ? ' AS ' . $this->driver->escapeIdentify($alias) : '');
 
         return $this;
     }
@@ -358,10 +389,11 @@ class QueryBuilder implements QueryBuilderInterface
     public function selectConcat(array $columns, ?string $alias = null): self
     {
         foreach ($columns as &$column) {
+            is_string($column) && $this->driver->escapeIdentify($column);
             $column = (string)$column;
         }
         $this->structure['select'][] = 'CONCAT(' . implode(', ', $columns) . ')'
-            . ($alias !== null ? ' AS ' . $alias : '');
+            . ($alias !== null ? ' AS ' . $this->driver->escapeIdentify($alias) : '');
 
         return $this;
     }
@@ -381,7 +413,8 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function addFrom(RawQuery|string $table, ?string $alias = null): self
     {
-        $table = $table . ($alias !== null ? ' AS ' . $alias : '');
+        is_string($table) && $this->driver->escapeIdentify($table);
+        $table = $table . ($alias !== null ? ' AS ' . $this->driver->escapeIdentify($alias) : '');
         if (!in_array($table, $this->structure['table'], true)) {
             $this->structure['table'][] = $table;
         }
@@ -394,6 +427,7 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function table(RawQuery|string $table): self
     {
+        is_string($table) && $this->driver->escapeIdentify($table);
         $this->structure['table'] = [(string)$table];
 
         return $this;
@@ -410,6 +444,7 @@ class QueryBuilder implements QueryBuilderInterface
                 continue;
             }
 
+            is_string($column) && $this->driver->escapeIdentify($column);
             $column = (string)$column;
             if (!in_array($column, $this->structure['group_by'])) {
                 $this->structure['group_by'][] = $column;
@@ -424,6 +459,7 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function join(RawQuery|string $table, RawQuery|Closure|string $onStmt = null, string $type = 'INNER'): self
     {
+        is_string($table) && $type !== 'SELF' && $this->driver->escapeIdentify($table);
         $table = (string)$table;
 
         if ($onStmt instanceof Closure) {
@@ -441,6 +477,8 @@ class QueryBuilder implements QueryBuilderInterface
                 }
                 $onStmt = $builder->__generateOnQuery();
             }
+        } else if (is_string($onStmt)) {
+            $this->driver->escapeIdentify($onStmt);
         }
 
         $type = trim(strtoupper($type));
@@ -525,6 +563,8 @@ class QueryBuilder implements QueryBuilderInterface
         if (!in_array($soft, ['ASC', 'DESC'], true)) {
             throw new QueryBuilderInvalidArgumentException('It can only sort as ASC or DESC.');
         }
+        is_string($column) && $this->driver->escapeIdentify($column);
+
         $orderBy = trim((string)$column) . ' ' . $soft;
 
         !in_array($orderBy, $this->structure['order_by'], true) && $this->structure['order_by'][] = $orderBy;
@@ -563,6 +603,10 @@ class QueryBuilder implements QueryBuilderInterface
     {
         $this->whereOrHavingPrepare($operator, $value, $logical);
 
+        if (is_string($value) && str_contains($value, '.')) {
+            $value = $this->raw($this->driver->escapeIdentify($value));
+        }
+
         $this->structure['on'][$logical][] = $this->whereOrHavingStatementPrepare($column, $operator, $value);
 
         return $this;
@@ -585,13 +629,16 @@ class QueryBuilder implements QueryBuilderInterface
             $set = [];
             foreach ($column as $name => $value) {
                 $name = (string)$name;
-                $set[$name] = $this->isSQLParameterOrFunction($value) ? $value : $this->parameters->add($name, $value);
+                $value = $this->isSQLParameterOrFunction($value) ? $value : $this->parameters->add($name, $value);
+                $this->driver->escapeIdentify($name);
+                $set[$name] = $value;
             }
             $this->structure['set'][] = $set;
 
             return $this;
         }
 
+        is_string($column) && $this->driver->escapeIdentify($column);
         $column = (string)$column;
         $value = $this->isSQLParameterOrFunction($value) ? $value : $this->parameters->add($column, $value);
 
@@ -1059,7 +1106,7 @@ class QueryBuilder implements QueryBuilderInterface
         $rawQuery = ($isIntervalQuery ? '(' : '')
             . $builder->generateSelectQuery()
             . ($isIntervalQuery ? ')' : '')
-            . ($alias !== null ? ' AS ' . $alias : '');
+            . ($alias !== null ? ' AS ' . $this->driver->escapeIdentify($alias) : '');
 
         return $this->raw($rawQuery);
     }
@@ -1076,8 +1123,6 @@ class QueryBuilder implements QueryBuilderInterface
 
         $builder = $this->clone();
         call_user_func_array($closure, [$builder->resetStructure()]);
-
-
 
         foreach (['where', 'on', 'having'] as $stmt) {
             $statement = $builder->__generateStructure($stmt);
@@ -1214,6 +1259,7 @@ class QueryBuilder implements QueryBuilderInterface
     public function generateUpdateBatchQuery(string $referenceColumn): string
     {
         $update = [];
+        $this->driver->escapeIdentify($referenceColumn);
         $data = $this->structure['set'];
         $updateData = $columns = $where = [];
         foreach ($data as $set) {
@@ -1283,6 +1329,7 @@ class QueryBuilder implements QueryBuilderInterface
     private function whereOrHavingStatementPrepare($column, $operator, $value): string
     {
         $operator = trim($operator);
+        is_string($column) && $this->driver->escapeIdentify($column);
         $column = (string)$column;
 
         if ($value !== null && in_array($operator, [
