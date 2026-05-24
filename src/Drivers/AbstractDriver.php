@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace InitORM\QueryBuilder\Drivers;
 
+use InitORM\QueryBuilder\Exceptions\QueryBuilderInvalidArgumentException;
+
 /**
  * Base implementation that handles the regex-driven identifier escaping.
  *
@@ -18,7 +20,14 @@ namespace InitORM\QueryBuilder\Drivers;
  *                                 empty string to disable quoting (see
  *                                 {@see GenericDriver}).
  *
- * The regex used by {@see self::escapeIdentifier()}:
+ * {@see self::escapeIdentifier()} rejects identifiers that contain SQL
+ * query-breakout sequences (`;` or `--`) — those characters never appear in
+ * legitimate identifiers and are the canonical pivot for SQL injection when
+ * a caller forwards user input as a table or column name without sanitising
+ * it. PostgreSQL allows multi-statement queries by default, which makes this
+ * defense-in-depth particularly important.
+ *
+ * After the validation step, the regex:
  *
  *   - skips bind-parameter prefixes ":foo";
  *   - skips the SQL keywords AND, OR, AS, ON (both cases);
@@ -38,10 +47,30 @@ abstract class AbstractDriver implements DriverInterface
     protected const ESCAPE_CHAR = '';
 
     /**
+     * Sequences that must never appear in an identifier — the SQL
+     * statement-separator and the line-comment leader. Blocking them defeats
+     * the most common identifier-pivoted injection technique.
+     */
+    private const FORBIDDEN_SEQUENCES = [';', '--'];
+
+    /**
      * @inheritDoc
+     *
+     * @throws QueryBuilderInvalidArgumentException When the identifier
+     *         contains a forbidden query-breakout sequence (`;` or `--`).
      */
     public function escapeIdentifier(string $identifier): string
     {
+        foreach (self::FORBIDDEN_SEQUENCES as $sequence) {
+            if (str_contains($identifier, $sequence)) {
+                throw new QueryBuilderInvalidArgumentException(sprintf(
+                    'Identifier contains a forbidden SQL sequence (%s): %s',
+                    $sequence,
+                    $identifier,
+                ));
+            }
+        }
+
         $char = static::ESCAPE_CHAR;
         if ($char === '') {
             return $identifier;

@@ -26,7 +26,7 @@ final class SqlValueDetector
      */
     public static function isSqlParameter(mixed $value): bool
     {
-        return is_string($value) && ($value === '?' || preg_match('/^:[(\w)]+$/', $value) === 1);
+        return is_string($value) && ($value === '?' || preg_match('/^:\w+$/', $value) === 1);
     }
 
     /**
@@ -49,7 +49,7 @@ final class SqlValueDetector
         }
 
         return $value === '?'
-            || preg_match('/^:[(\w)]+$/', $value) === 1
+            || preg_match('/^:\w+$/', $value) === 1
             || preg_match('/^[a-zA-Z_]+[.]+[a-zA-Z_]+$/', $value) === 1
             || preg_match('/^[a-zA-Z_]+\(\)$/', $value) === 1;
     }

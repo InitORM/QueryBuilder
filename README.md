@@ -140,6 +140,31 @@ Full developer documentation with runnable examples lives in
 [`docs/`](docs/) — see [`docs/en/index.md`](docs/en/index.md) for the table
 of contents.
 
+## Security
+
+InitORM QueryBuilder is built around the rule **"user input is a value, never
+an identifier or a SQL fragment"**. Defenses shipped in 2.0.0:
+
+- **Identifier hardening** — `escapeIdentifier()` rejects `;` and `--` so
+  query-breakout characters in a column or table name cannot survive the
+  escape pass (relevant especially on PostgreSQL, where PDO allows
+  multi-statement queries by default).
+- **LIKE wildcard auto-escape** — `%`, `_`, and `\` inside user-supplied
+  LIKE values are escaped by default. Opt out with `$qb->raw(...)` when
+  raw wildcards are intentional.
+- **Strict placeholder regex** — placeholder names are now tightly bound
+  to `^:\w+$`.
+- **FIND\_IN\_SET parameter fix (B28)** — a pre-2.0.0 inversion bug
+  inlined raw user strings as SQL; fixed.
+
+The full threat model, residual application-level concerns
+(`ORDER BY` whitelisting, value-shaped function detection), and a complete
+regression suite live in [`docs/en/security.md`](docs/en/security.md) and
+[`tests/SecurityTest.php`](tests/SecurityTest.php).
+
+Report vulnerabilities through the
+[organization-wide security policy](https://github.com/InitORM/.github/blob/main/SECURITY.md).
+
 ## Tests, lint, static analysis
 
 ```bash

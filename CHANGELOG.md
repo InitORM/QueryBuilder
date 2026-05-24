@@ -102,6 +102,24 @@ suite at 96 % line coverage, and CI on PHP 8.1 → 8.4.
   into SQL while pre-bound `RawQuery` placeholders were re-parameterized.
   This was a latent SQL-injection vector for any caller passing
   user-supplied strings to `findInSet()` / `notFindInSet()`. Fixed.
+- **V3 (security, hardening)** — `AbstractDriver::escapeIdentifier()` now
+  rejects identifiers containing `;` or `--`. These sequences never appear
+  in legitimate identifiers and are the canonical pivot for SQL injection
+  when a caller forwards user input as a table or column name. The check
+  runs before the dialect's quoting, so even the no-op `GenericDriver`
+  gets the defense-in-depth. PostgreSQL — which allows multi-statement
+  queries by default — was the highest-risk consumer.
+- **V4 (security, hardening)** — `WhereClauseTrait::prepareStatement()`
+  now escapes the SQL wildcard characters (`%`, `_`) and the escape
+  character itself (`\`) in any user-supplied value flowing through the
+  LIKE family. Previously, `like('name', '%')` compiled to
+  `LIKE '%%%'` (equivalent to `LIKE '%'`) — which let any user enumerate
+  every row by typing `%` into a search box. Opt-out: pass a `RawQuery`
+  when raw wildcards are deliberately desired.
+- **V6 (security, hardening)** — `SqlValueDetector` placeholder regex
+  tightened from `/^:[(\w)]+$/` to `/^:\w+$/`. The previous character
+  class spuriously permitted `(` and `)` inside placeholder names — never
+  a valid PDO bind name.
 - **B26** — `BucketCompiler` previously joined the AND-bucket and the
   OR-bucket of every WHERE / HAVING / ON clause with `" AND "`, which
   silently collapsed every top-level `orX()` chain into an `AND`. A call

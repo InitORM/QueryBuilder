@@ -32,9 +32,12 @@ It turns a fluent chain of method calls into a SQL string and a separate
 10. **[Drivers](drivers.md)** — built-in dialects (MySQL, PostgreSQL,
     SQLite, generic), identifier escape rules, and how to write a custom
     driver.
-11. **[Recipes](recipes.md)** — common scenarios distilled into runnable
+11. **[Security](security.md)** — threat model, defenses shipped in
+    v2.0.0, application-level residual risks, and the safe-patterns
+    cookbook.
+12. **[Recipes](recipes.md)** — common scenarios distilled into runnable
     snippets: pagination, soft-delete, dynamic filters, upsert, ranking.
-12. **[API reference](api-reference.md)** — a categorized table of every
+13. **[API reference](api-reference.md)** — a categorized table of every
     public method exposed by `QueryBuilderInterface`.
 
 ## How this documentation is structured

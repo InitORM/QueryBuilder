@@ -208,4 +208,4 @@ $qb->where($qb->raw($col . ' = ' . $qb->raw('NOW()')));
 generic driver) and is what `newBuilder()` uses to propagate the
 dialect to a sibling builder.
 
-**Next:** [Recipes →](recipes.md)
+**Next:** [Security →](security.md)

@@ -649,7 +649,23 @@ trait WhereClauseTrait
             case 'NOTSTARTLIKE':
             case 'ENDLIKE':
             case 'NOTENDLIKE':
+                if ($value instanceof RawQuery) {
+                    // RawQuery: caller has opted out of every safety net —
+                    // inline verbatim, no parameterization, no escape.
+                    return $column
+                        . (in_array($searchOperator, Operators::LIKE_NEGATED, true) ? ' NOT' : '')
+                        . ' LIKE ' . $value;
+                }
                 if (!SqlValueDetector::isSqlParameter($value)) {
+                    // Escape LIKE wildcards (%, _) and the escape character
+                    // itself (\) in the supplied value so user input that
+                    // happens to contain those characters is treated as
+                    // literal text rather than as part of the LIKE pattern.
+                    $value = str_replace(
+                        ['\\', '%', '_'],
+                        ['\\\\', '\\%', '\\_'],
+                        (string) $value,
+                    );
                     $prefix = in_array($searchOperator, Operators::LIKE_PREFIX_WILDCARD, true) ? '%' : '';
                     $suffix = in_array($searchOperator, Operators::LIKE_SUFFIX_WILDCARD, true) ? '%' : '';
                     $value = $prefix . $value . $suffix;
