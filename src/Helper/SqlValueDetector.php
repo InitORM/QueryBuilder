@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package InitORM\QueryBuilder
  * @license MIT
@@ -53,6 +54,7 @@ final class SqlValueDetector
             || preg_match('/^[a-zA-Z_]+\(\)$/', $value) === 1;
     }
 
+    /** @codeCoverageIgnore */
     private function __construct()
     {
     }

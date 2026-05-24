@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package InitORM\QueryBuilder
  * @license MIT
@@ -17,6 +18,8 @@ use InitORM\QueryBuilder\Exceptions\QueryBuilderException;
 final class BatchInsertCompiler extends AbstractCompiler
 {
     /**
+     * @param array<string, mixed> $structure
+     *
      * @throws QueryBuilderException
      */
     public function compile(array $structure): string

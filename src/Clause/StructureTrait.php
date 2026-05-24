@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package InitORM\QueryBuilder
  * @license MIT
@@ -23,19 +24,16 @@ use InitORM\QueryBuilder\ParameterInterface;
  */
 trait StructureTrait
 {
+    /**
+     * @inheritDoc
+     */
     public function newBuilder(): static
     {
         return new static($this->driver->getName());
     }
 
     /**
-     * Resets the structure to its blank-slate state, optionally preserving
-     * (or zeroing) only specific keys.
-     *
-     * @param string[]|string|null $ignoreOrCare Keys to act on (or null to
-     *                                           reset everything).
-     * @param bool|null            $isIgnore     true → keep the listed keys;
-     *                                           false → zero only those keys.
+     * @inheritDoc
      */
     public function resetStructure(null|array|string $ignoreOrCare = null, ?bool $isIgnore = null): static
     {
@@ -63,11 +61,19 @@ trait StructureTrait
         return $this;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function clone(): static
     {
         return clone $this;
     }
 
+    /**
+     * @inheritDoc
+     *
+     * @param array<string, mixed> $structure
+     */
     public function importQB(array $structure, bool $merge = false): static
     {
         $this->structure = array_merge($merge ? $this->structure : self::STRUCTURE, $structure);
@@ -75,16 +81,27 @@ trait StructureTrait
         return $this;
     }
 
+    /**
+     * @inheritDoc
+     *
+     * @return array<string, mixed>
+     */
     public function exportQB(): array
     {
         return $this->structure;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getParameter(): ParameterInterface
     {
         return $this->parameters;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function setParameter(string $key, mixed $value): static
     {
         $this->parameters->set($key, $value);
@@ -92,6 +109,11 @@ trait StructureTrait
         return $this;
     }
 
+    /**
+     * @inheritDoc
+     *
+     * @param array<string, mixed> $parameters
+     */
     public function setParameters(array $parameters = []): static
     {
         foreach ($parameters as $key => $value) {
@@ -101,6 +123,9 @@ trait StructureTrait
         return $this;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getDriver(): DriverInterface
     {
         return $this->driver;

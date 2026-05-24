@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package InitORM\QueryBuilder
  * @license MIT
@@ -15,6 +16,9 @@ namespace InitORM\QueryBuilder;
  */
 class QueryBuilderFactory implements QueryBuilderFactoryInterface
 {
+    /**
+     * @inheritDoc
+     */
     public function createQueryBuilder(?string $driver = null): QueryBuilderInterface
     {
         return new QueryBuilder($driver);

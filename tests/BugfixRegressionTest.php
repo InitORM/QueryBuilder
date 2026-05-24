@@ -1,4 +1,5 @@
 <?php
+
 /**
  * InitORM QueryBuilder
  *
@@ -21,6 +22,7 @@
  */
 
 declare(strict_types=1);
+
 namespace Test\InitORM\QueryBuilder;
 
 use InitORM\QueryBuilder\Exceptions\QueryBuilderException;
@@ -315,5 +317,44 @@ class BugfixRegressionTest extends AbstractQueryBuilderUnit
     {
         $ref = new \ReflectionClass(AbstractQueryBuilderDriverUnit::class);
         $this->assertTrue($ref->isAbstract());
+    }
+
+    // -----------------------------------------------------------------------
+    // B26 — mixed AND/OR bucket join now uses " OR " as the inter-bucket
+    // connector. where(a).orWhere(b) compiles to "a OR b" (was "a AND b").
+    // -----------------------------------------------------------------------
+
+    public function testWhereThenOrWhereCompilesToOrAtTopLevel(): void
+    {
+        $this->db->from('users')
+            ->where('country', 'TR')
+            ->orWhere('country', 'US');
+
+        $expected = 'SELECT * FROM users WHERE country = :country OR country = :country_1';
+        $this->assertEquals($expected, $this->db->generateSelectQuery());
+    }
+
+    public function testWhereThenOrBetweenCompilesToOr(): void
+    {
+        $this->db->from('post')
+            ->where('status', 1)
+            ->orBetween('id', 10, 20);
+
+        $expected = 'SELECT * FROM post WHERE status = 1 OR id BETWEEN 10 AND 20';
+        $this->assertEquals($expected, $this->db->generateSelectQuery());
+    }
+
+    public function testMultipleAndPlusMultipleOrUsesAndPrecedence(): void
+    {
+        // (a AND b) OR c OR d — SQL precedence (AND > OR) keeps the AND-list
+        // bound tightly; the resulting expression matches the natural reading.
+        $this->db->from('post')
+            ->where('a', 1)
+            ->where('b', 2)
+            ->orWhere('c', 3)
+            ->orWhere('d', 4);
+
+        $expected = 'SELECT * FROM post WHERE a = 1 AND b = 2 OR c = 3 OR d = 4';
+        $this->assertEquals($expected, $this->db->generateSelectQuery());
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package InitORM\QueryBuilder
  * @license MIT
@@ -18,6 +19,14 @@ final class BucketCompiler
 {
     /**
      * Returns null if both AND and OR sub-lists are empty.
+     *
+     * AND-clauses are joined with " AND ", OR-clauses with " OR ", and when
+     * both sub-lists are non-empty they are concatenated with " OR " — so a
+     * chain like {@code where(a).orWhere(b)} compiles to {@code a OR b}
+     * (relying on SQL's usual `AND > OR` precedence for the
+     * {@code a AND b OR c → (a AND b) OR c} parse).
+     *
+     * @param array<string, mixed> $structure
      */
     public static function compile(array $structure, string $key): ?string
     {
@@ -28,10 +37,11 @@ final class BucketCompiler
         }
 
         return (!$isAndEmpty ? implode(' AND ', $structure[$key]['AND']) : '')
-            . (!$isAndEmpty && !$isOrEmpty ? ' AND ' : '')
+            . (!$isAndEmpty && !$isOrEmpty ? ' OR ' : '')
             . (!$isOrEmpty ? implode(' OR ', $structure[$key]['OR']) : '');
     }
 
+    /** @codeCoverageIgnore */
     private function __construct()
     {
     }

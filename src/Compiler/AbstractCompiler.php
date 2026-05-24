@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package InitORM\QueryBuilder
  * @license MIT
@@ -20,6 +21,8 @@ abstract class AbstractCompiler implements CompilerInterface
 {
     /**
      * Compile the WHERE bucket (without the leading "WHERE" keyword).
+     *
+     * @param array<string, mixed> $structure
      */
     protected function compileWhere(array $structure): ?string
     {
@@ -29,6 +32,8 @@ abstract class AbstractCompiler implements CompilerInterface
     /**
      * Compile the HAVING bucket, prefixed with " HAVING ". Returns null when
      * the bucket is empty.
+     *
+     * @param array<string, mixed> $structure
      */
     protected function compileHaving(array $structure): ?string
     {
@@ -38,17 +43,11 @@ abstract class AbstractCompiler implements CompilerInterface
     }
 
     /**
-     * Compile the ON bucket (used by JOIN closure helpers).
-     */
-    protected function compileOnQuery(array $structure): ?string
-    {
-        return $this->compileBucket($structure, 'on');
-    }
-
-    /**
-     * Compile the AND/OR bucket of WHERE, HAVING or ON. AND-clauses are
-     * joined with " AND ", OR-clauses with " OR ", and when both lists are
-     * non-empty they are concatenated with " AND " (B26 — see Aşama 1 notes).
+     * Compile the AND/OR bucket of WHERE, HAVING or ON. Delegates to
+     * {@see BucketCompiler::compile()}; see that method for the joining
+     * rules.
+     *
+     * @param array<string, mixed> $structure
      */
     protected function compileBucket(array $structure, string $key): ?string
     {
@@ -58,6 +57,8 @@ abstract class AbstractCompiler implements CompilerInterface
     /**
      * Compile the LIMIT / OFFSET tail. Returns " LIMIT n", " LIMIT m, n",
      * " OFFSET n" or null.
+     *
+     * @param array<string, mixed> $structure
      */
     protected function compileLimit(array $structure): ?string
     {
@@ -81,6 +82,8 @@ abstract class AbstractCompiler implements CompilerInterface
      * Returns the schema (table) name targeted by INSERT/UPDATE/DELETE.
      * Multiple tables in {@code structure['table']} mean the caller is in
      * SELECT/JOIN territory; for mutation queries we use the last entry.
+     *
+     * @param array<string, mixed> $structure
      *
      * @throws QueryBuilderException
      */

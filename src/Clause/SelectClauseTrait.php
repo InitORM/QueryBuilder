@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package InitORM\QueryBuilder
  * @license MIT
@@ -19,6 +20,9 @@ use InitORM\QueryBuilder\RawQuery;
  */
 trait SelectClauseTrait
 {
+    /**
+     * @inheritDoc
+     */
     public function select(string|RawQuery ...$columns): static
     {
         foreach ($columns as $column) {
@@ -31,6 +35,9 @@ trait SelectClauseTrait
         return $this;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function clearSelect(): static
     {
         $this->structure['select'] = [];
@@ -38,31 +45,55 @@ trait SelectClauseTrait
         return $this;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function selectCount(RawQuery|string $column, ?string $alias = null): static
     {
         return $this->pushSelectFunction('COUNT', $column, $alias);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function selectCountDistinct(RawQuery|string $column, ?string $alias = null): static
     {
-        return $this->pushSelectFunction('COUNT(DISTINCT ', $column, $alias, ')');
+        if (is_string($column)) {
+            $column = $this->driver->escapeIdentifier($column);
+        }
+        $this->structure['select'][] = 'COUNT(DISTINCT ' . $column . ')'
+            . ($alias !== null ? ' AS ' . $this->driver->escapeIdentifier($alias) : '');
+
+        return $this;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function selectMax(RawQuery|string $column, ?string $alias = null): static
     {
         return $this->pushSelectFunction('MAX', $column, $alias);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function selectMin(RawQuery|string $column, ?string $alias = null): static
     {
         return $this->pushSelectFunction('MIN', $column, $alias);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function selectAvg(RawQuery|string $column, ?string $alias = null): static
     {
         return $this->pushSelectFunction('AVG', $column, $alias);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function selectAs(RawQuery|string $column, string $alias): static
     {
         if (is_string($column)) {
@@ -73,21 +104,33 @@ trait SelectClauseTrait
         return $this;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function selectUpper(RawQuery|string $column, ?string $alias = null): static
     {
         return $this->pushSelectFunction('UPPER', $column, $alias);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function selectLower(RawQuery|string $column, ?string $alias = null): static
     {
         return $this->pushSelectFunction('LOWER', $column, $alias);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function selectLength(RawQuery|string $column, ?string $alias = null): static
     {
         return $this->pushSelectFunction('LENGTH', $column, $alias);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function selectMid(RawQuery|string $column, int $offset, int $length, ?string $alias = null): static
     {
         if (is_string($column)) {
@@ -99,6 +142,9 @@ trait SelectClauseTrait
         return $this;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function selectLeft(RawQuery|string $column, int $length, ?string $alias = null): static
     {
         if (is_string($column)) {
@@ -110,6 +156,9 @@ trait SelectClauseTrait
         return $this;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function selectRight(RawQuery|string $column, int $length, ?string $alias = null): static
     {
         if (is_string($column)) {
@@ -121,11 +170,17 @@ trait SelectClauseTrait
         return $this;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function selectDistinct(RawQuery|string $column, ?string $alias = null): static
     {
         return $this->pushSelectFunction('DISTINCT', $column, $alias);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function selectCoalesce(RawQuery|string $column, mixed $default = '0', ?string $alias = null): static
     {
         if (is_string($column)) {
@@ -140,11 +195,17 @@ trait SelectClauseTrait
         return $this;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function selectSum(RawQuery|string $column, ?string $alias = null): static
     {
         return $this->pushSelectFunction('SUM', $column, $alias);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function selectConcat(array $columns, ?string $alias = null): static
     {
         $escaped = [];
@@ -160,6 +221,9 @@ trait SelectClauseTrait
         return $this;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function groupBy(string|RawQuery|array ...$columns): static
     {
         foreach ($columns as $column) {
@@ -180,6 +244,8 @@ trait SelectClauseTrait
     }
 
     /**
+     * @inheritDoc
+     *
      * @throws QueryBuilderInvalidArgumentException
      */
     public function orderBy(RawQuery|string $column, string $soft = 'ASC'): static
@@ -200,6 +266,9 @@ trait SelectClauseTrait
         return $this;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function offset(int $offset = 0): static
     {
         $this->structure['offset'] = (int) abs($offset);
@@ -207,6 +276,9 @@ trait SelectClauseTrait
         return $this;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function limit(int $limit): static
     {
         $this->structure['limit'] = (int) abs($limit);
@@ -216,16 +288,20 @@ trait SelectClauseTrait
 
     /**
      * Generic single-argument SQL function projection — used by COUNT, MAX,
-     * MIN, AVG, SUM, UPPER, LOWER, LENGTH, DISTINCT and (with a custom open)
-     * COUNT(DISTINCT …).
+     * MIN, AVG, SUM, UPPER, LOWER, LENGTH and DISTINCT. Emits
+     * "FUNCTION(column)" with an optional alias.
+     *
+     * @param string          $function The function name (no parens).
+     * @param RawQuery|string $column   The argument — escaped if string,
+     *                                  passed through if {@see RawQuery}.
+     * @param string|null     $alias    Optional alias for the projection.
      */
-    private function pushSelectFunction(string $function, RawQuery|string $column, ?string $alias, string $tail = ')'): static
+    private function pushSelectFunction(string $function, RawQuery|string $column, ?string $alias): static
     {
         if (is_string($column)) {
             $column = $this->driver->escapeIdentifier($column);
         }
-        $open = str_ends_with($function, '(') ? $function : $function . '(';
-        $this->structure['select'][] = $open . $column . $tail
+        $this->structure['select'][] = $function . '(' . $column . ')'
             . ($alias !== null ? ' AS ' . $this->driver->escapeIdentifier($alias) : '');
 
         return $this;

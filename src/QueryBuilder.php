@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package InitORM\QueryBuilder
  * @license MIT
@@ -34,6 +35,8 @@ use InitORM\QueryBuilder\Exceptions\QueryBuilderException;
  * {@see \InitORM\QueryBuilder\Clause}, and the {@code generate*Query()}
  * methods delegate SQL string assembly to the dedicated compilers in
  * {@see \InitORM\QueryBuilder\Compiler}.
+ *
+ * @phpstan-consistent-constructor
  */
 class QueryBuilder implements QueryBuilderInterface
 {
@@ -62,6 +65,7 @@ class QueryBuilder implements QueryBuilderInterface
         'on'       => ['AND' => [], 'OR' => []],
     ];
 
+    /** @var array<string, mixed> */
     protected array $structure;
     protected ParameterInterface $parameters;
     protected DriverInterface $driver;
@@ -76,6 +80,15 @@ class QueryBuilder implements QueryBuilderInterface
             'sqlite'                           => new SqliteDriver(),
             default                            => new GenericDriver(),
         };
+    }
+
+    /**
+     * Deep-clone the parameter bag so mutations on the clone do not bleed
+     * back into the original; the driver is stateless and may stay shared.
+     */
+    public function __clone()
+    {
+        $this->parameters = clone $this->parameters;
     }
 
     /**
@@ -105,6 +118,9 @@ class QueryBuilder implements QueryBuilderInterface
     }
 
     /**
+     * @param array<int, string|RawQuery>   $selector
+     * @param array<int|string, mixed>      $conditions
+     *
      * @throws QueryBuilderException
      */
     public function generateSelectQuery(array $selector = [], array $conditions = []): string

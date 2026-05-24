@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package InitORM\QueryBuilder
  * @license MIT
@@ -16,10 +17,14 @@ use InitORM\QueryBuilder\RawQuery;
  * JOIN-clause builders. Each variant boils down to {@see self::join()} with a
  * different keyword. When {@code $onStmt} is a Closure, it is invoked with a
  * fresh QueryBuilder so the caller can compose the ON clause using the same
- * fluent API (and optionally raise WHERE / HAVING side-conditions).
+ * fluent API (and optionally raise WHERE / HAVING side-conditions that are
+ * folded back into the outer query).
  */
 trait JoinClauseTrait
 {
+    /**
+     * @inheritDoc
+     */
     public function join(RawQuery|string $table, RawQuery|Closure|string|null $onStmt = null, string $type = 'INNER'): static
     {
         if (is_string($table) && $type !== 'SELF') {
@@ -61,36 +66,57 @@ trait JoinClauseTrait
         return $this;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function selfJoin(RawQuery|string $table, RawQuery|Closure|string $onStmt): static
     {
         return $this->join($table, $onStmt, 'SELF');
     }
 
+    /**
+     * @inheritDoc
+     */
     public function innerJoin(RawQuery|string $table, RawQuery|Closure|string $onStmt): static
     {
         return $this->join($table, $onStmt);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function leftJoin(RawQuery|string $table, RawQuery|Closure|string $onStmt): static
     {
         return $this->join($table, $onStmt, 'LEFT');
     }
 
+    /**
+     * @inheritDoc
+     */
     public function rightJoin(RawQuery|string $table, RawQuery|Closure|string $onStmt): static
     {
         return $this->join($table, $onStmt, 'RIGHT');
     }
 
+    /**
+     * @inheritDoc
+     */
     public function leftOuterJoin(RawQuery|string $table, RawQuery|Closure|string $onStmt): static
     {
         return $this->join($table, $onStmt, 'LEFT OUTER');
     }
 
+    /**
+     * @inheritDoc
+     */
     public function rightOuterJoin(RawQuery|string $table, RawQuery|Closure|string $onStmt): static
     {
         return $this->join($table, $onStmt, 'RIGHT OUTER');
     }
 
+    /**
+     * @inheritDoc
+     */
     public function naturalJoin(RawQuery|string $table): static
     {
         return $this->join($table, null, 'NATURAL');

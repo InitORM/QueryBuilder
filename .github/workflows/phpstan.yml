@@ -1,0 +1,40 @@
+name: PHPStan
+
+on:
+  push:
+    branches: ["master", "main", "v2.x", "v2.0.x"]
+  pull_request:
+    branches: ["master", "main", "v2.x", "v2.0.x"]
+
+permissions:
+  contents: read
+
+jobs:
+  phpstan:
+    name: Static analysis (level 6)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          coverage: none
+          tools: composer:v2
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/composer
+          key: composer-${{ runner.os }}-stan-${{ hashFiles('**/composer.json') }}
+          restore-keys: |
+            composer-${{ runner.os }}-stan-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Run PHPStan
+        run: composer stan

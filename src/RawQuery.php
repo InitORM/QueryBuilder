@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package InitORM\QueryBuilder
  * @license MIT
@@ -14,6 +15,14 @@ use Closure;
  * A SQL fragment that should be inlined verbatim and NOT escaped or
  * parameterized. Use sparingly — values that originate from user input must
  * pass through {@see ParameterInterface::add()} instead.
+ *
+ * Three input forms are accepted:
+ *   - a string — used as-is;
+ *   - a {@see Closure} — invoked with a fresh {@see QueryBuilder}; the
+ *     closure may either return the SQL string itself or build it up via
+ *     the supplied builder (the resulting SQL is then captured via
+ *     {@code __toString()});
+ *   - any other value — cast to string.
  */
 class RawQuery
 {
@@ -29,6 +38,10 @@ class RawQuery
         return $this->get();
     }
 
+    /**
+     * Replace the stored SQL fragment. See class docblock for accepted input
+     * forms.
+     */
     public function set(mixed $rawQuery): self
     {
         if (is_string($rawQuery)) {
@@ -50,11 +63,17 @@ class RawQuery
         return $this;
     }
 
+    /**
+     * The stored SQL fragment (empty string if never set).
+     */
     public function get(): string
     {
         return $this->raw ?? '';
     }
 
+    /**
+     * Convenience static factory — equivalent to {@code new RawQuery($rawQuery)}.
+     */
     public static function raw(mixed $rawQuery): self
     {
         return new self($rawQuery);

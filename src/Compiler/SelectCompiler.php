@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package InitORM\QueryBuilder
  * @license MIT
@@ -15,6 +16,9 @@ namespace InitORM\QueryBuilder\Compiler;
  */
 final class SelectCompiler extends AbstractCompiler
 {
+    /**
+     * @param array<string, mixed> $structure
+     */
     public function compile(array $structure): string
     {
         return 'SELECT '

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package InitORM\QueryBuilder
  * @license MIT
@@ -17,6 +18,9 @@ use InitORM\QueryBuilder\RawQuery;
  */
 trait FromClauseTrait
 {
+    /**
+     * @inheritDoc
+     */
     public function from(RawQuery|string $table, ?string $alias = null): static
     {
         $this->structure['table'] = [];
@@ -24,6 +28,9 @@ trait FromClauseTrait
         return $this->addFrom($table, $alias);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function addFrom(RawQuery|string $table, ?string $alias = null): static
     {
         if (is_string($table)) {
@@ -37,6 +44,9 @@ trait FromClauseTrait
         return $this;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function table(RawQuery|string $table): static
     {
         if (is_string($table)) {

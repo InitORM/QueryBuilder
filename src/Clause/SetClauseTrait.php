@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package InitORM\QueryBuilder
  * @license MIT
@@ -18,11 +19,17 @@ use InitORM\QueryBuilder\RawQuery;
  */
 trait SetClauseTrait
 {
+    /**
+     * @inheritDoc
+     */
     public function set(RawQuery|array|string $column, mixed $value = null, bool $strict = true): static
     {
         return $this->addSet($column, $value, $strict);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function addSet(RawQuery|array|string $column, mixed $value = null, bool $strict = true): static
     {
         unset($strict); // reserved for future use; kept for backwards-compatible signature

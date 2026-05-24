@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package InitORM\QueryBuilder
  * @license MIT
@@ -10,13 +11,17 @@ namespace InitORM\QueryBuilder;
 
 /**
  * Factory contract for {@see QueryBuilderInterface}. Useful when callers
- * want to inject a builder factory rather than newing one up.
+ * prefer to dependency-inject a factory rather than newing up a builder
+ * directly — e.g. when sharing dialect selection across a request.
  */
 interface QueryBuilderFactoryInterface
 {
     /**
-     * Build a new query builder using the named driver (mysql / pgsql /
-     * sqlite / null = generic).
+     * Build a new query builder using the named driver.
+     *
+     * @param string|null $driver One of "mysql", "pgsql" ("postgres",
+     *                            "postgresql"), "sqlite", or null for the
+     *                            generic (no-escaping) driver.
      */
     public function createQueryBuilder(?string $driver = null): QueryBuilderInterface;
 }

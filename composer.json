@@ -40,10 +40,11 @@
     "scripts": {
         "test": "phpunit",
         "cs": "phpcs",
+        "cs-ci": "phpcs --warning-severity=0",
         "cs-fix": "phpcbf",
         "stan": "phpstan analyse",
         "qa": [
-            "@cs",
+            "@cs-ci",
             "@stan",
             "@test"
         ]

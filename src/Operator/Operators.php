@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @package InitORM\QueryBuilder
  * @license MIT
@@ -136,6 +137,7 @@ final class Operators
         'SELF',
     ];
 
+    /** @codeCoverageIgnore */
     private function __construct()
     {
     }
