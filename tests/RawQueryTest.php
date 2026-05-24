@@ -63,11 +63,12 @@ class RawQueryTest extends TestCase
         $this->assertSame('42', (string) $raw);
     }
 
-    public function testGetReturnsEmptyStringByDefault(): void
+    public function testGetReturnsEmptyStringWhenConstructedWithEmptyString(): void
     {
-        // The constructor always calls set(), so this only exercises the
-        // null-coalesce fall-back inside get() — useful when subclasses
-        // bypass set().
+        // The constructor calls set(''), which assigns the empty string to
+        // $this->raw. The previous null-coalesce fall-back in get() was
+        // unreachable defensive code — PHPStan 2.x correctly flagged it,
+        // and it was removed.
         $raw = new RawQuery('');
         $this->assertSame('', $raw->get());
     }
