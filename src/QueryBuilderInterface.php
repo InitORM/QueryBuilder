@@ -219,7 +219,7 @@ interface QueryBuilderInterface
      * @param string $type
      * @return self
      */
-    public function join(RawQuery|string $table, RawQuery|string|Closure $onStmt = null, string $type = 'INNER'): self;
+    public function join(RawQuery|string $table, RawQuery|string|Closure|null $onStmt = null, string $type = 'INNER'): self;
 
 
     /**
@@ -267,10 +267,9 @@ interface QueryBuilderInterface
 
     /**
      * @param string|RawQuery $table
-     * @param string|RawQuery|Closure $onStmt
      * @return self
      */
-    public function naturalJoin(string|RawQuery $table, string|RawQuery|Closure $onStmt): self;
+    public function naturalJoin(string|RawQuery $table): self;
 
     /**
      * @param string|RawQuery $column
@@ -281,30 +280,30 @@ interface QueryBuilderInterface
 
     /**
      * @param string|RawQuery $column
-     * @param string $operator
-     * @param mixed|null $value
-     * @param string $logical []
-     * @return self
-     */
-    public function where(RawQuery|string $column, string $operator = '=', mixed $value = null, string $logical = 'AND'): self;
-
-    /**
-     * @param string|RawQuery $column
-     * @param string $operator
-     * @param mixed|null $value
-     * @param string $logical []
-     * @return self
-     */
-    public function having(RawQuery|string $column, string $operator = '=', mixed $value = null, string $logical = 'AND'): self;
-
-    /**
-     * @param RawQuery|string $column
-     * @param string $operator
+     * @param mixed $operator
      * @param mixed|null $value
      * @param string $logical
      * @return self
      */
-    public function on(RawQuery|string $column, string $operator = '=', mixed $value = null, string $logical = 'AND'): self;
+    public function where(RawQuery|string $column, mixed $operator = '=', mixed $value = null, string $logical = 'AND'): self;
+
+    /**
+     * @param string|RawQuery $column
+     * @param mixed $operator
+     * @param mixed|null $value
+     * @param string $logical
+     * @return self
+     */
+    public function having(RawQuery|string $column, mixed $operator = '=', mixed $value = null, string $logical = 'AND'): self;
+
+    /**
+     * @param RawQuery|string $column
+     * @param mixed $operator
+     * @param mixed|null $value
+     * @param string $logical
+     * @return self
+     */
+    public function on(RawQuery|string $column, mixed $operator = '=', mixed $value = null, string $logical = 'AND'): self;
 
 
     /**
@@ -327,20 +326,20 @@ interface QueryBuilderInterface
 
     /**
      * @param string|RawQuery $column
-     * @param string $operator
+     * @param mixed $operator
      * @param mixed|null $value
      * @return self
      */
-    public function andWhere(string|RawQuery $column, string $operator = '=', mixed $value = null): self;
+    public function andWhere(string|RawQuery $column, mixed $operator = '=', mixed $value = null): self;
 
 
     /**
      * @param string|RawQuery $column
-     * @param string $operator
+     * @param mixed $operator
      * @param mixed|null $value
      * @return self
      */
-    public function orWhere(string|RawQuery $column, string $operator = '=', mixed $value = null): self;
+    public function orWhere(string|RawQuery $column, mixed $operator = '=', mixed $value = null): self;
 
     /**
      * @param string|RawQuery $column
@@ -755,10 +754,11 @@ interface QueryBuilderInterface
      * Where|On|Having
      *
      * @param Closure $closure
+     * @param string $logical
      * @return self
      * @throws QueryBuilderException
      */
-    public function group(Closure $closure): self;
+    public function group(Closure $closure, string $logical = 'AND'): self;
 
     /**
      * @param mixed $rawQuery

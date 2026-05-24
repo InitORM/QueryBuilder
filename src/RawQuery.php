@@ -14,6 +14,8 @@
 declare(strict_types=1);
 namespace InitORM\QueryBuilder;
 
+use Closure;
+
 class RawQuery
 {
 

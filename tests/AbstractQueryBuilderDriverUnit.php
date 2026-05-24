@@ -18,7 +18,7 @@ use InitORM\QueryBuilder\QueryBuilderFactory;
 use InitORM\QueryBuilder\QueryBuilderInterface;
 use PHPUnit\Framework\TestCase;
 
-class AbstractQueryBuilderDriverUnit extends TestCase
+abstract class AbstractQueryBuilderDriverUnit extends TestCase
 {
     protected QueryBuilderInterface $db;
 

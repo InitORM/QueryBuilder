@@ -457,7 +457,7 @@ class QueryBuilder implements QueryBuilderInterface
     /**
      * @inheritDoc
      */
-    public function join(RawQuery|string $table, RawQuery|Closure|string $onStmt = null, string $type = 'INNER'): self
+    public function join(RawQuery|string $table, RawQuery|Closure|string|null $onStmt = null, string $type = 'INNER'): self
     {
         is_string($table) && $type !== 'SELF' && $this->driver->escapeIdentify($table);
         $table = (string)$table;
@@ -549,7 +549,7 @@ class QueryBuilder implements QueryBuilderInterface
     /**
      * @inheritDoc
      */
-    public function naturalJoin(RawQuery|string $table, RawQuery|Closure|string $onStmt): self
+    public function naturalJoin(RawQuery|string $table): self
     {
         return $this->join($table, null, 'NATURAL');
     }
@@ -682,7 +682,7 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function orBetween(RawQuery|string $column, mixed $firstValue = null, mixed $lastValue = null): self
     {
-        return $this->between($column, [$firstValue, $lastValue], 'OR');
+        return $this->between($column, $firstValue, $lastValue, 'OR');
     }
 
     /**
@@ -816,7 +816,7 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function andWhereNotIn(RawQuery|string $column, mixed $value = null): self
     {
-        return $this->where($column, 'IN', $value);
+        return $this->where($column, 'NOT IN', $value);
     }
 
     /**
@@ -954,7 +954,7 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function orLike(RawQuery|array|string $column, mixed $value = null, string $type = 'both'): self
     {
-        return $this->like($column, $value, $type);
+        return $this->like($column, $value, $type, 'OR');
     }
 
     /**
@@ -962,7 +962,7 @@ class QueryBuilder implements QueryBuilderInterface
      */
     public function andLike(RawQuery|array|string $column, mixed $value = null, string $type = 'both'): self
     {
-        return $this->like($column, $value, $type, 'OR');
+        return $this->like($column, $value, $type, 'AND');
     }
 
     /**
@@ -1242,7 +1242,7 @@ class QueryBuilder implements QueryBuilderInterface
             $updateSet[] = $column . ' = ' . $value;
         }
         if (empty($updateSet)) {
-            throw new QueryBuilderException('The data set for the insert could not be found.');
+            throw new QueryBuilderException('The data set for the update could not be found.');
         }
 
         return 'UPDATE ' . $this->__generateSchemaName()
@@ -1328,7 +1328,7 @@ class QueryBuilder implements QueryBuilderInterface
 
     private function whereOrHavingStatementPrepare($column, $operator, $value): string
     {
-        $operator = trim($operator);
+        $operator = is_string($operator) ? trim($operator) : '=';
         is_string($column) && $this->driver->escapeIdentify($column);
         $column = (string)$column;
 
@@ -1360,15 +1360,15 @@ class QueryBuilder implements QueryBuilderInterface
             case 'ENDLIKE':
             case 'NOTENDLIKE':
                 if (!$this->isSQLParameter($value)) {
-                    $value = (in_array($searchOperator, ['LIKE', 'NOTLIKE', 'STARTLIKE', 'NOTSTARTLIKE']) ? '%' : '')
-                        . $value
-                        . (in_array($searchOperator, ['LIKE', 'NOTLIKE', 'ENDLIKE', 'NOTENDLIKE']) ? '%' : '');
+                    $prefix = in_array($searchOperator, ['LIKE', 'NOTLIKE', 'ENDLIKE', 'NOTENDLIKE'], true) ? '%' : '';
+                    $suffix = in_array($searchOperator, ['LIKE', 'NOTLIKE', 'STARTLIKE', 'NOTSTARTLIKE'], true) ? '%' : '';
+                    $value = $prefix . $value . $suffix;
 
                     $value = $this->parameters->add($column, $value);
                 }
 
                 return $column
-                    . (in_array($searchOperator, ['NOTSTARTLIKE', 'NOTLIKE', 'NOTENDLIKE']) ? ' NOT' : '')
+                    . (in_array($searchOperator, ['NOTSTARTLIKE', 'NOTLIKE', 'NOTENDLIKE'], true) ? ' NOT' : '')
                     . ' LIKE ' . $value;
             case 'BETWEEN':
             case 'NOTBETWEEN':
@@ -1412,7 +1412,7 @@ class QueryBuilder implements QueryBuilderInterface
                 }
                 return "SOUNDEX(" . $column . ") LIKE CONCAT('%', TRIM(TRAILING '0' FROM SOUNDEX(" . $value . ")), '%')";
             default:
-                if ($value === null && preg_match('/([\w_]+)\((.+)\)$/iu', $column, $matches) !== FALSE) {
+                if ($value === null && preg_match('/([\w_]+)\((.+)\)$/iu', $column, $matches) === 1) {
                     return strtoupper($matches[1]) . '(' . $matches[2] . ')';
                 }
                 return $column . ' ' . $operator . ' ' . $this->parameters->add($column, $value);
@@ -1496,7 +1496,7 @@ class QueryBuilder implements QueryBuilderInterface
                 '=', '!=', '>', '<', '>=', '<=', '<>',
                 '+', '-', '*', '/', '%',
                 '+=', '-=', '*=', '/=', '%=', '&=', '^-=', '|*='
-            ])) {
+            ], true)) {
             $value = $operator;
             $operator = '=';
         }
