@@ -64,11 +64,13 @@ class RawQuery
     }
 
     /**
-     * The stored SQL fragment (empty string if never set).
+     * The stored SQL fragment. The constructor always calls {@see self::set()},
+     * which always assigns `$this->raw` in every branch, so the property is
+     * guaranteed to be initialised by the time this getter runs.
      */
     public function get(): string
     {
-        return $this->raw ?? '';
+        return $this->raw;
     }
 
     /**
