@@ -1,21 +1,19 @@
 <?php
 /**
- * InitORM QueryBuilder
- *
- * This file is part of InitORM QueryBuilder.
- *
- * @author      Muhammet ŞAFAK <info@muhammetsafak.com.tr>
- * @copyright   Copyright © 2023 Muhammet ŞAFAK
- * @license     ./LICENSE  MIT
- * @version     1.0
- * @link        https://www.muhammetsafak.com.tr
+ * @package InitORM\QueryBuilder
+ * @license MIT
  */
 
 declare(strict_types=1);
+
 namespace InitORM\QueryBuilder\Exceptions;
 
 use InvalidArgumentException;
 
+/**
+ * Thrown when a user-supplied argument is well-formed but not acceptable —
+ * an unknown sort direction, an unknown logical connector, etc.
+ */
 class QueryBuilderInvalidArgumentException extends InvalidArgumentException
 {
 }

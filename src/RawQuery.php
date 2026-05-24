@@ -1,24 +1,22 @@
 <?php
 /**
- * InitORM QueryBuilder
- *
- * This file is part of InitORM QueryBuilder.
- *
- * @author      Muhammet ŞAFAK <info@muhammetsafak.com.tr>
- * @copyright   Copyright © 2023 Muhammet ŞAFAK
- * @license     ./LICENSE  MIT
- * @version     1.0
- * @link        https://www.muhammetsafak.com.tr
+ * @package InitORM\QueryBuilder
+ * @license MIT
  */
 
 declare(strict_types=1);
+
 namespace InitORM\QueryBuilder;
 
 use Closure;
 
+/**
+ * A SQL fragment that should be inlined verbatim and NOT escaped or
+ * parameterized. Use sparingly — values that originate from user input must
+ * pass through {@see ParameterInterface::add()} instead.
+ */
 class RawQuery
 {
-
     private string $raw;
 
     public function __construct(mixed $rawQuery)
@@ -35,18 +33,18 @@ class RawQuery
     {
         if (is_string($rawQuery)) {
             $this->raw = $rawQuery;
-        } else if ($rawQuery instanceof Closure) {
+        } elseif ($rawQuery instanceof Closure) {
             $builder = new QueryBuilder();
-            $res = call_user_func_array($rawQuery, [&$builder]);
-            if (is_string($res)) {
-                $this->raw = $res;
-            } else if (is_object($res) && method_exists($res, '__toString')) {
-                $this->raw = $res->__toString();
+            $result = $rawQuery($builder);
+            if (is_string($result)) {
+                $this->raw = $result;
+            } elseif (is_object($result) && method_exists($result, '__toString')) {
+                $this->raw = $result->__toString();
             } else {
                 $this->raw = $builder->__toString();
             }
         } else {
-            $this->raw = (string)$rawQuery;
+            $this->raw = (string) $rawQuery;
         }
 
         return $this;
@@ -57,9 +55,8 @@ class RawQuery
         return $this->raw ?? '';
     }
 
-    public static function raw($rawQuery): self
+    public static function raw(mixed $rawQuery): self
     {
         return new self($rawQuery);
     }
-
 }
