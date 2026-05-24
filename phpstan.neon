@@ -1,0 +1,22 @@
+parameters:
+    level: 6
+    paths:
+        - src
+    treatPhpDocTypesAsCertain: false
+    ignoreErrors:
+        # The LIKE-family and set / addSet methods deliberately accept either
+        # a scalar column / value or an array form for batch use. The array
+        # contents vary by caller — we keep the loose "array" hint on these
+        # public-API methods to avoid noise in callers.
+        -
+            message: '#Method InitORM\\QueryBuilder\\QueryBuilderInterface::(or|and|not|orNot|andNot|start|orStart|andStart|notStart|orStartNot|andStartNot|end|orEnd|andEnd|notEnd|orEndNot|andEndNot)?(L|l)ike\(\) has parameter \$column with no value type specified in iterable type array\.#'
+            path: src/QueryBuilderInterface.php
+        -
+            message: '#Method InitORM\\QueryBuilder\\QueryBuilder::(or|and|not|orNot|andNot|start|orStart|andStart|notStart|orStartNot|andStartNot|end|orEnd|andEnd|notEnd|orEndNot|andEndNot)?(L|l)ike\(\) has parameter \$column with no value type specified in iterable type array\.#'
+            path: src/Clause/WhereClauseTrait.php
+        -
+            message: '#Method InitORM\\QueryBuilder\\QueryBuilderInterface::(set|addSet)\(\) has parameter \$column with no value type specified in iterable type array\.#'
+            path: src/QueryBuilderInterface.php
+        -
+            message: '#Method InitORM\\QueryBuilder\\QueryBuilder::(set|addSet)\(\) has parameter \$column with no value type specified in iterable type array\.#'
+            path: src/Clause/SetClauseTrait.php

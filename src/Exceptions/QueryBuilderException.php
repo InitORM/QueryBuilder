@@ -1,21 +1,20 @@
 <?php
+
 /**
- * InitORM QueryBuilder
- *
- * This file is part of InitORM QueryBuilder.
- *
- * @author      Muhammet ŞAFAK <info@muhammetsafak.com.tr>
- * @copyright   Copyright © 2023 Muhammet ŞAFAK
- * @license     ./LICENSE  MIT
- * @version     1.0
- * @link        https://www.muhammetsafak.com.tr
+ * @package InitORM\QueryBuilder
+ * @license MIT
  */
 
 declare(strict_types=1);
+
 namespace InitORM\QueryBuilder\Exceptions;
 
 use Exception;
 
+/**
+ * Thrown on structural query problems — missing table, missing data set,
+ * invalid sub-query alias placement, etc.
+ */
 class QueryBuilderException extends Exception
 {
 }

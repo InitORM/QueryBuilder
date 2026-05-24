@@ -1,4 +1,5 @@
 <?php
+
 /**
  * InitORM QueryBuilder
  *
@@ -12,6 +13,7 @@
  */
 
 declare(strict_types=1);
+
 namespace Test\InitORM\QueryBuilder;
 
 use InitORM\QueryBuilder\QueryBuilderFactory;
@@ -20,14 +22,11 @@ use PHPUnit\Framework\TestCase;
 
 abstract class AbstractQueryBuilderUnit extends TestCase
 {
-
     protected QueryBuilderInterface $db;
-
     protected function setUp(): void
     {
         $factory = new QueryBuilderFactory();
         $this->db = $factory->createQueryBuilder();
         parent::setUp();
     }
-
 }

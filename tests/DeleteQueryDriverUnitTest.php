@@ -1,4 +1,5 @@
 <?php
+
 /**
  * InitORM QueryBuilder
  *
@@ -12,22 +13,19 @@
  */
 
 declare(strict_types=1);
+
 namespace Test\InitORM\QueryBuilder;
 
 class DeleteQueryDriverUnitTest extends AbstractQueryBuilderDriverUnit
 {
-
     public function testDeleteStatementBuild()
     {
 
         $this->db->from('post')
             ->where('authorId', '=', 5)
             ->limit(100);
-
         $expected = 'DELETE FROM `post` WHERE `authorId` = 5 LIMIT 100';
-
         $this->assertEquals($expected, $this->db->generateDeleteQuery());
         $this->db->resetStructure();
     }
-
 }

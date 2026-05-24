@@ -1,22 +1,31 @@
 <?php
+
 /**
- * InitORM QueryBuilder
- *
- * This file is part of InitORM QueryBuilder.
- *
- * @author      Muhammet ŞAFAK <info@muhammetsafak.com.tr>
- * @copyright   Copyright © 2023 Muhammet ŞAFAK
- * @license     ./LICENSE  MIT
- * @version     1.0
- * @link        https://www.muhammetsafak.com.tr
+ * @package InitORM\QueryBuilder
+ * @license MIT
  */
 
 declare(strict_types=1);
+
 namespace InitORM\QueryBuilder;
 
+use Closure;
+
+/**
+ * A SQL fragment that should be inlined verbatim and NOT escaped or
+ * parameterized. Use sparingly — values that originate from user input must
+ * pass through {@see ParameterInterface::add()} instead.
+ *
+ * Three input forms are accepted:
+ *   - a string — used as-is;
+ *   - a {@see Closure} — invoked with a fresh {@see QueryBuilder}; the
+ *     closure may either return the SQL string itself or build it up via
+ *     the supplied builder (the resulting SQL is then captured via
+ *     {@code __toString()});
+ *   - any other value — cast to string.
+ */
 class RawQuery
 {
-
     private string $raw;
 
     public function __construct(mixed $rawQuery)
@@ -29,35 +38,44 @@ class RawQuery
         return $this->get();
     }
 
+    /**
+     * Replace the stored SQL fragment. See class docblock for accepted input
+     * forms.
+     */
     public function set(mixed $rawQuery): self
     {
         if (is_string($rawQuery)) {
             $this->raw = $rawQuery;
-        } else if ($rawQuery instanceof Closure) {
+        } elseif ($rawQuery instanceof Closure) {
             $builder = new QueryBuilder();
-            $res = call_user_func_array($rawQuery, [&$builder]);
-            if (is_string($res)) {
-                $this->raw = $res;
-            } else if (is_object($res) && method_exists($res, '__toString')) {
-                $this->raw = $res->__toString();
+            $result = $rawQuery($builder);
+            if (is_string($result)) {
+                $this->raw = $result;
+            } elseif (is_object($result) && method_exists($result, '__toString')) {
+                $this->raw = $result->__toString();
             } else {
                 $this->raw = $builder->__toString();
             }
         } else {
-            $this->raw = (string)$rawQuery;
+            $this->raw = (string) $rawQuery;
         }
 
         return $this;
     }
 
+    /**
+     * The stored SQL fragment (empty string if never set).
+     */
     public function get(): string
     {
         return $this->raw ?? '';
     }
 
-    public static function raw($rawQuery): self
+    /**
+     * Convenience static factory — equivalent to {@code new RawQuery($rawQuery)}.
+     */
+    public static function raw(mixed $rawQuery): self
     {
         return new self($rawQuery);
     }
-
 }

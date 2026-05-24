@@ -1,4 +1,5 @@
 <?php
+
 /**
  * InitORM QueryBuilder
  *
@@ -12,16 +13,14 @@
  */
 
 declare(strict_types=1);
+
 namespace Test\InitORM\QueryBuilder;
 
 class InsertQueryDriverUnitTest extends AbstractQueryBuilderDriverUnit
 {
-
-
     public function testInsertStatementBuild()
     {
         $this->db->from('post');
-
         $data = [
             'title'     => 'Post Title',
             'content'   => 'Post Content',
@@ -29,8 +28,6 @@ class InsertQueryDriverUnitTest extends AbstractQueryBuilderDriverUnit
             'status'    => true,
         ];
         $this->db->set($data);
-
-
         $expected = 'INSERT INTO `post` (`title`, `content`, `author`, `status`) VALUES (:title, :content, 5, :status);';
         $this->assertEquals($expected, $this->db->generateInsertQuery());
         $this->db->resetStructure();
@@ -40,7 +37,6 @@ class InsertQueryDriverUnitTest extends AbstractQueryBuilderDriverUnit
     {
 
         $this->db->from('post');
-
         $this->db->set([
             'title'     => 'Post Title #1',
             'content'   => 'Post Content #1',
@@ -52,10 +48,8 @@ class InsertQueryDriverUnitTest extends AbstractQueryBuilderDriverUnit
                 'content'   => 'Post Content #2',
                 'status'    => false,
             ]);
-
         $expected = 'INSERT INTO `post` (`title`, `content`, `author`, `status`) VALUES (:title, :content, 5, :status), (:title_1, :content_1, NULL, :status_1);';
         $this->assertEquals($expected, $this->db->generateBatchInsertQuery());
         $this->db->resetStructure();
     }
-
 }

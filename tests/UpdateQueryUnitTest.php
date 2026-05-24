@@ -1,4 +1,5 @@
 <?php
+
 /**
  * InitORM QueryBuilder
  *
@@ -12,28 +13,25 @@
  */
 
 declare(strict_types=1);
+
 namespace Test\InitORM\QueryBuilder;
 
 use Test\InitORM\QueryBuilder\AbstractQueryBuilderUnit;
 
 class UpdateQueryUnitTest extends AbstractQueryBuilderUnit
 {
-
     public function testUpdateStatementBuild()
     {
 
         $this->db->from('post')
             ->where('status', '=', true)
             ->limit(5);
-
         $data = [
             'title'     => 'New Title',
             'status'    => false,
         ];
         $this->db->set($data);
-
         $expected = 'UPDATE post SET title = :title, status = :status_1 WHERE status = :status LIMIT 5';
-
         $this->assertEquals($expected, $this->db->generateUpdateQuery());
         $this->db->resetStructure();
     }
@@ -43,7 +41,6 @@ class UpdateQueryUnitTest extends AbstractQueryBuilderUnit
 
         $this->db->from('post')
             ->where('status', '=', true);
-
         $this->db->set([
             'id'        => 5,
             'title'     => 'New Title #5',
@@ -52,11 +49,8 @@ class UpdateQueryUnitTest extends AbstractQueryBuilderUnit
             'id'        => 10,
             'title'     => 'New Title #10',
         ]);
-
         $expected = 'UPDATE post SET title = CASE WHEN id = 5 THEN :title WHEN id = 10 THEN :title_1 ELSE title END, content = CASE WHEN id = 5 THEN :content ELSE content END WHERE status = :status AND id IN (5, 10)';
-
         $this->assertEquals($expected, $this->db->generateUpdateBatchQuery('id'));
         $this->db->resetStructure();
     }
-
 }
