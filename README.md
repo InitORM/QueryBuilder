@@ -8,6 +8,8 @@
 [![PHPStan](https://github.com/InitORM/QueryBuilder/actions/workflows/phpstan.yml/badge.svg)](https://github.com/InitORM/QueryBuilder/actions/workflows/phpstan.yml)
 [![PHP_CodeSniffer](https://github.com/InitORM/QueryBuilder/actions/workflows/phpcs.yml/badge.svg)](https://github.com/InitORM/QueryBuilder/actions/workflows/phpcs.yml)
 
+[![Designed & Maintained with Tan](https://www.muhammetsafak.com.tr/badges/designed-maintained-with-tan.svg)](https://www.muhammetsafak.com.tr/en/tan/)
+
 A lightweight, dialect-aware **SQL query builder** for PHP. It turns fluent
 calls into a SQL string plus a separate parameter bag suitable for direct
 execution with **PDO** — without ever concatenating user values into SQL.
