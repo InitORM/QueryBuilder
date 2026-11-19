@@ -8,7 +8,7 @@
 [![PHPStan](https://github.com/InitORM/QueryBuilder/actions/workflows/phpstan.yml/badge.svg)](https://github.com/InitORM/QueryBuilder/actions/workflows/phpstan.yml)
 [![PHP_CodeSniffer](https://github.com/InitORM/QueryBuilder/actions/workflows/phpcs.yml/badge.svg)](https://github.com/InitORM/QueryBuilder/actions/workflows/phpcs.yml)
 
-[![Designed & Maintained with Tan](https://www.muhammetsafak.com.tr/badges/designed-maintained-with-tan.svg)](https://www.muhammetsafak.com.tr/en/tan/)
+[![Designed & Maintained with Tan](https://muhammetsafak.com/badges/designed-maintained-with-tan.svg)](https://muhammetsafak.com/tan/)
 
 A lightweight, dialect-aware **SQL query builder** for PHP. It turns fluent
 calls into a SQL string plus a separate parameter bag suitable for direct
@@ -212,6 +212,6 @@ MIT — see [LICENSE](LICENSE).
 
 ## Credits
 
-Authored and maintained by [Muhammet ŞAFAK](https://www.muhammetsafak.com.tr)
-&lt;info@muhammetsafak.com.tr&gt;. Issues and contributions are welcome on
+Authored and maintained by [Muhammet ŞAFAK](https://muhammetsafak.com)
+&lt;info@muhammetsafak.com&gt;. Issues and contributions are welcome on
 [GitHub](https://github.com/InitORM/QueryBuilder).
