@@ -17,7 +17,7 @@
  *   B20   — UPDATE exception message
  *   B23   — abstract test base classes
  *
- * @author      Muhammet ŞAFAK <info@muhammetsafak.com.tr>
+ * @author      Muhammet ŞAFAK <info@muhammetsafak.com>
  * @license     ./LICENSE  MIT
  */
 
